@@ -1,0 +1,19 @@
+{
+  "name": "traffic-stop",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "npm run watch & serve .",
+    "watch": "watchify index.js -o build.js -v",
+    "build": "browserify index.js -o build.js -v"
+  },
+  "devDependencies": {
+    "browserify": "^13.1.1",
+    "serve": "^1.4.0",
+    "watchify": "^3.7.0"
+  },
+  "dependencies": {
+    "tile-cover": "^3.0.1",
+    "turf": "^3.0.14"
+  }
+}
