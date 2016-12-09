@@ -18,14 +18,8 @@ map.addControl(new mapboxgl.NavigationControl({
   position: "top-right"
 }));
 
-var mly = new Mapillary.Viewer("mly", "MFo5YmpwMmxHMmxJaUt3VW14c0ZCZzphZDU5ZDBjNTMzN2Y3YTE3", null, {
-  attribution: false,
-  direction: false,
-  mouse: false
-});
+var mly = new Mapillary.Viewer("mly", "MFo5YmpwMmxHMmxJaUt3VW14c0ZCZzphZDU5ZDBjNTMzN2Y3YTE3", null);
 $("#mly").hide();
-
-var mapillaryImageKey;
 
 map.once("load", function() {
   hideDefaultLayers();
@@ -261,8 +255,6 @@ function setupMapillary() {
       var imageKey = image.properties.key;
       var sequenceKey = image.properties.skey;
 
-      mapillaryImageKey = imageKey;
-
       map.setFilter("mapillaryImageHighlight", ["==", "key", imageKey]);
       map.setFilter("mapillarySequenceLine", ["==", "key", sequenceKey]);
 
@@ -271,18 +263,9 @@ function setupMapillary() {
     }
   });
 
-  mly.on('nodechanged', function(node) {
+  mly.on(Mapillary.Viewer.nodechanged, function(node) {
     map.setFilter("mapillaryImageHighlight", ["==", "key", node.key]);
-    map.setFilter("mapillarySequenceLine", ["==", "key", node.sequence.key]);
-
-    mapillaryImageKey = node.key;
-  });
-
-  $("#mly").click(function(e) {
-    if (e.target.className == "domRenderer") {
-      var url = "https://d1cuyjsrcm0gby.cloudfront.net/" + mapillaryImageKey + "/thumb-2048.jpg";
-      window.open(url, "_blank")
-    }
+    map.setFilter("mapillarySequenceLine", ["==", "key", node.sequenceKey]);
   });
 }
 
@@ -381,7 +364,7 @@ function setupOSMRestrictions() {
       "visibility": "visible"
     },
     "paint": {
-      "circle-color": "hsl(0, 66%, 53%)",
+      "circle-color": "hsl(0, 80%, 50%)",
       "circle-opacity": {
         "base": 1,
         "stops": [
@@ -393,7 +376,7 @@ function setupOSMRestrictions() {
         "base": 1,
         "stops": [
           [10, 4],
-          [13.9, 8]
+          [13.9, 10]
         ]
       }
     }
@@ -408,7 +391,7 @@ function setupOSMRestrictions() {
       "visibility": "visible"
     },
     "paint": {
-      "circle-color": "hsl(206, 100%, 50%)",
+      "circle-color": "hsl(200, 80%, 50%)",
       "circle-opacity": {
         "base": 1,
         "stops": [
@@ -420,7 +403,7 @@ function setupOSMRestrictions() {
         "base": 1,
         "stops": [
           [10, 4],
-          [13.9, 8]
+          [13.9, 10]
         ]
       }
     }
@@ -428,7 +411,36 @@ function setupOSMRestrictions() {
 }
 
 function setupOSMJunctions() {
+  map.addSource("osmJunctionsSource", {
+    "type": "geojson",
+    "data": osmJunctions
+  });
 
+  map.addLayer({
+    "id": "osmJunctions",
+    "type": "circle",
+    "source": "osmJunctionsSource",
+    "layout": {
+      "visibility": "visible"
+    },
+    "paint": {
+      "circle-color": "hsl(50, 80%, 50%)",
+      "circle-opacity": {
+        "base": 1,
+        "stops": [
+          [13.9, 0],
+          [14, 0.6]
+        ]
+      },
+      "circle-radius": {
+        "base": 1,
+        "stops": [
+          [10, 2],
+          [13.9, 6]
+        ]
+      }
+    }
+  });
 }
 
 function setupJOSMButton() {

@@ -9,8 +9,8 @@
     <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.28.0/mapbox-gl.css" rel="stylesheet" />
 
     <!-- mapillary js -->
-    <script src="https://npmcdn.com/mapillary-js@1.6.0/dist/mapillary-js.min.js"></script>
-    <link href="https://npmcdn.com/mapillary-js@1.6.0/dist/mapillary-js.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/mapillary-js@2.1.0/dist/mapillary.min.js"></script>
+    <link href="https://unpkg.com/mapillary-js@2.1.0/dist/mapillary.min.css" rel="stylesheet" />
 
     <!-- styles -->
     <link href="https://www.mapbox.com/base/latest/base.css" rel="stylesheet" />
@@ -21,9 +21,9 @@
   </head>
   <body>
     <div id="map"></div>
-    <div style="position: absolute; bottom: 0">
+    <div style="position: absolute; top: 0">
       <div class="pad1">
-        <div id="mly" style="width: 320px; height: 240px"></div>
+        <div id="mly" style="width: 520px; height: 360px;"></div>
       </div>
       <div class="pill pad1 toggles">
         <input type="button" id="josm" class="button animate" value="Open in JOSM" />
