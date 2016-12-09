@@ -1,4 +1,4 @@
-var overpassResults = {
+var osmRestrictions = {
 "type": "FeatureCollection",
 "features": [
 { "type": "Feature", "properties": { "@id": "node\/26027656", "highway": "traffic_signals" }, "geometry": { "type": "Point", "coordinates": [ -122.11361, 37.40138 ] } },

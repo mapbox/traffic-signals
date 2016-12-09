@@ -28,9 +28,12 @@ var mapillaryImageKey;
 
 map.once("load", function() {
   hideDefaultLayers();
+  highlightMajorRoads();
+
   setupMapillary();
   setupTileBoundaries();
-  setupOverpass();
+  setupOSMRestrictions();
+  setupOSMJunctions();
   setupJOSMButton();
 });
 
@@ -42,6 +45,12 @@ function hideDefaultLayers() {
   map.setLayoutProperty("oneways", "visibility", "none");
   map.setLayoutProperty("oneways arrows", "visibility", "none");
 }
+
+function highlightMajorRoads() {
+  map.setPaintProperty("road-primary", "line-color", "hsl(0, 14%, 47%)");
+  map.setPaintProperty("road-secondary-tertiary", "line-color", "hsl(0, 14%, 47%)");
+  map.setPaintProperty("road-trunk", "line-color", "hsl(0, 14%, 47%)");
+};
 
 function setupMapillary() {
   map.addSource("mapillary", {
@@ -356,10 +365,10 @@ function setupTileBoundaries() {
   }
 }
 
-function setupOverpass() {
+function setupOSMRestrictions() {
   map.addSource("osmRestrictionsSource", {
     "type": "geojson",
-    "data": overpassResults 
+    "data": osmRestrictions
   });
 
   map.addLayer({
@@ -417,6 +426,9 @@ function setupOverpass() {
   });
 }
 
+function setupOSMJunctions() {
+
+}
 
 function setupJOSMButton() {
   $("#josm").on('click', openInJOSM);
