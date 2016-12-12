@@ -411,9 +411,21 @@ function setupOSMRestrictions() {
 }
 
 function setupOSMJunctions() {
+  var DATASETS_PROXY_URL = "https://xck30z94kl.execute-api.us-east-1.amazonaws.com/testing/features";
+
+  var osmJunctions = {
+    type: "FeatureCollection",
+    features: []
+  };
+
   map.addSource("osmJunctionsSource", {
     "type": "geojson",
     "data": osmJunctions
+  });
+
+  $.getJSON(DATASETS_PROXY_URL, function(data) {
+    map.getSource("osmJunctionsSource")
+      .setData(data);
   });
 
   map.addLayer({
