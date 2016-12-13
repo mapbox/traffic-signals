@@ -431,13 +431,24 @@ function setupOSMJunctions() {
     "data": osmJunctions
   });
 
-  $.getJSON(DATASETS_PROXY_URL, function(data) {
-    data.features.forEach(f => f.properties.uid = f.id);
+  function getFeatures(startID) {
+    var url = DATASETS_PROXY_URL + (startID ? '?start=' + startID : '');
 
-    osmJunctions = data;
-    map.getSource("osmJunctionsSource")
-      .setData(data);
-  });
+    $.getJSON(url, function(data) {
+      if (data.features.length) {
+        data.features.forEach(f => f.properties.uid = f.id);
+
+        osmJunctions.features = osmJunctions.features.concat(data.features);
+        map.getSource("osmJunctionsSource")
+          .setData(osmJunctions);
+
+        var lastFeatureID = data.features[data.features.length - 1].id;
+        getFeatures(lastFeatureID);
+      }
+    })
+  }
+
+  getFeatures();
 
   map.addLayer({
     "id": "osmJunctionsHighlight",
@@ -566,11 +577,11 @@ function setupOSMJunctions() {
     var selectedJunctions = map.queryRenderedFeatures([
       [e.point.x - 5, e.point.y - 5],
       [e.point.x + 5, e.point.y + 5]
-    ], { layers: ["osmJunctions"] });
+    ], { layers: ["osmJunctions", "osmJunctionsReviewed", "osmJunctionsAdded", "osmJunctionsNoSignal"] });
 
     if (selectedJunctions.length) {
       var selectedJunction = selectedJunctions[0];
-      map.setFilter("osmJunctionsHighlight", ["==", "id", selectedJunction.properties.id]);
+      map.setFilter("osmJunctionsHighlight", ["==", "uid", selectedJunction.properties.uid]);
       reviewJunction(selectedJunction);
     }
 
