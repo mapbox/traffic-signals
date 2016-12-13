@@ -423,6 +423,8 @@ function setupOSMJunctions() {
   });
 
   $.getJSON(DATASETS_PROXY_URL, function(data) {
+    data.features.forEach(f => f.properties.uid = f.id);
+
     osmJunctions = data;
     map.getSource("osmJunctionsSource")
       .setData(data);
@@ -478,6 +480,56 @@ function setupOSMJunctions() {
     if (selectedJunctions.length) {
       var selectedJunction = selectedJunctions[0];
       map.setFilter("osmJunctionsHighlight", ["==", "id", selectedJunction.properties.id]);
+      reviewJunction(selectedJunction);
+    }
+
+    function reviewJunction(junction) {
+      var reviewForm = ""
+        + "<div>"
+          + "<div class='radio-pill pill pad2y clearfix'>"
+            + "<input id='reviewed' type='radio' name='review' value='reviewed'>"
+            + "<label for='reviewed' class='button short icon check'>Reviewed</label>"
+            + "<input id='added' type='radio' name='review' value='added'>"
+            + "<label for='added' class='button short icon check'>Added</label>"
+            + "<input id='nosignal' type='radio' name='review' value='nosignal'>"
+            + "<label for='nosignal' class='button icon short check'>No Signal</label>"
+          + "</div>"
+          + "<div>"
+            + "<a id='save-review' class='margin2 button loud col8'>Save</a>"
+          + "</div>"
+        + "</div>";
+
+      var popup = new mapboxgl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML(reviewForm)
+        .addTo(map);
+
+      $('#save-review').on('click', function() {
+        junction.properties.status = $("input[name=review]:checked").val();
+
+        function uid(feature) {
+          return feature.properties.uid;
+        }
+
+        var reviewedFeature = {
+          type: 'Feature',
+          geometry: junction.geometry,
+          properties: junction.properties
+        };
+
+        $.ajax({
+          url: DATASETS_PROXY_URL + "/" + uid(reviewedFeature),
+          type: "PUT",
+          contentType: "application/json",
+          data: JSON.stringify(reviewedFeature)
+        }).done(function(response) {
+          osmJunctions.features = osmJunctions.features
+            .filter(f => uid(f) !== uid(reviewedFeature))
+            .concat(reviewedFeature);
+          map.getSource("osmJunctionsSource").setData(osmJunctions);
+          popup.remove();
+        });
+      });
     }
   });
 }
