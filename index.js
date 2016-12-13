@@ -423,8 +423,24 @@ function setupOSMJunctions() {
   });
 
   $.getJSON(DATASETS_PROXY_URL, function(data) {
+    osmJunctions = data;
     map.getSource("osmJunctionsSource")
       .setData(data);
+  });
+
+  map.addLayer({
+    "id": "osmJunctionsHighlight",
+    "type": "circle",
+    "source": "osmJunctionsSource",
+    "layout": {
+      "visibility": "visible"
+    },
+    "paint": {
+      "circle-radius": 10,
+      "circle-opacity": 0.3,
+      "circle-color": "white"
+    },
+    "filter": ["==", "id", ""]
   });
 
   map.addLayer({
@@ -450,6 +466,18 @@ function setupOSMJunctions() {
           [13.9, 6]
         ]
       }
+    }
+  });
+
+  map.on('click', function(e) {
+    var selectedJunctions = map.queryRenderedFeatures([
+      [e.point.x - 5, e.point.y - 5],
+      [e.point.x + 5, e.point.y + 5]
+    ], { layers: ["osmJunctions"] });
+
+    if (selectedJunctions.length) {
+      var selectedJunction = selectedJunctions[0];
+      map.setFilter("osmJunctionsHighlight", ["==", "id", selectedJunction.properties.id]);
     }
   });
 }
