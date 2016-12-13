@@ -40,9 +40,9 @@ function hideDefaultLayers() {
 }
 
 function highlightMajorRoads() {
-  map.setPaintProperty("road-primary", "line-color", "#dddddd");
-  map.setPaintProperty("road-secondary-tertiary", "line-color", "#dddddd");
-  map.setPaintProperty("road-trunk", "line-color", "#dddddd");
+  map.setPaintProperty("road-primary", "line-color", "#aaaaaa");
+  map.setPaintProperty("road-secondary-tertiary", "line-color", "#aaaaaa");
+  map.setPaintProperty("road-trunk", "line-color", "#aaaaaa");
 };
 
 function setupMapillary() {
@@ -85,11 +85,11 @@ function setupMapillary() {
     "source": "mapillaryCoverage",
     "source-layer": "mapillary-sequences",
     "paint": {
-      "line-color": "white",
+      "line-color": "#66cc66",
       "line-width": {
         "stops": [
-          [8, 1],
-          [13, 3],
+          [8, 0.5],
+          [13, 1],
           [16, 2]
         ]
       },
@@ -113,13 +113,14 @@ function setupMapillary() {
       "icon-rotate": {
         "property": "ca",
         "stops": iconRotations()
-      }
+      },
+      "icon-rotation-alignment": "map"
     },
     "paint": {
       "icon-opacity": {
         "stops": [
           [15, 0],
-          [16, 1]
+          [16, 0.7]
         ]
       }
     }
@@ -135,7 +136,8 @@ function setupMapillary() {
       "icon-rotate": {
         "property": "ca",
         "stops": iconRotations()
-      }
+      },
+      "icon-rotation-alignment": "map"
     },
     "filter": ["==", "key", ""]
   });
@@ -150,7 +152,8 @@ function setupMapillary() {
       "icon-rotate": {
         "property": "ca",
         "stops": iconRotations()
-      }
+      },
+      "icon-rotation-alignment": "map"
     },
     "filter": ["==", "key", ""]
   });
@@ -165,7 +168,8 @@ function setupMapillary() {
       "icon-rotate": {
         "property": "ca",
         "stops": iconRotations()
-      }
+      },
+      "icon-rotation-alignment": "map"
     },
     "filter": ["==", "key", ""]
   });
@@ -189,7 +193,6 @@ function setupMapillary() {
     "source": "mapillary",
     "source-layer": "objects",
     "layout": {
-      "icon-image": "{value}",
       "icon-image": "{value}",
       "icon-allow-overlap": true,
       "icon-size": 0.8
@@ -215,8 +218,8 @@ function setupMapillary() {
       "text-halo-width": 1,
       "text-opacity": {
         "stops": [
-          [15, 0],
-          [16, 1]
+          [18, 0],
+          [19, 1]
         ]
       }
     },
@@ -295,8 +298,15 @@ function setupTileBoundaries() {
     "layout": {
       "visibility": "visible",
       "text-field": "{id}",
-      "text-size": 14,
-      "text-offset": [4, 4],
+      "text-size":  {
+        "base": 1.5,
+        "stops": [
+          [13, 8],
+          [14, 14]
+        ]
+      },
+      "text-offset": [0, 0],
+      "text-anchor": "center",
     },
     "paint": {
       "text-color": "#cc6666",
@@ -362,12 +372,12 @@ function setupOSMRestrictions() {
       "visibility": "visible"
     },
     "paint": {
-      "circle-color": "hsl(0, 80%, 50%)",
+      "circle-color": "hsl(0, 60%, 50%)",
       "circle-opacity": {
         "base": 1,
         "stops": [
           [13.9, 0],
-          [14, 0.6]
+          [14, 0.8]
         ]
       },
       "circle-radius": {
@@ -389,12 +399,12 @@ function setupOSMRestrictions() {
       "visibility": "visible"
     },
     "paint": {
-      "circle-color": "hsl(200, 80%, 50%)",
+      "circle-color": "hsl(200, 70%, 50%)",
       "circle-opacity": {
         "base": 1,
         "stops": [
           [13.9, 0],
-          [14, 0.6]
+          [14, 0.8]
         ]
       },
       "circle-radius": {
@@ -452,12 +462,12 @@ function setupOSMJunctions() {
       "visibility": "visible"
     },
     "paint": {
-      "circle-color": "#ffff55",
+      "circle-color": "#cccc00",
       "circle-opacity": {
         "base": 1,
         "stops": [
           [13.9, 0],
-          [14, 0.6]
+          [14, 0.9]
         ]
       },
       "circle-radius": {
@@ -467,7 +477,8 @@ function setupOSMJunctions() {
           [13.9, 6]
         ]
       }
-    }
+    },
+    "filter": ["!has", "status"]
   });
 
   map.addLayer({
@@ -478,12 +489,12 @@ function setupOSMJunctions() {
       "visibility": "visible"
     },
     "paint": {
-      "circle-color": "#eeeeee",
+      "circle-color": "#bbbbbb",
       "circle-opacity": {
         "base": 1,
         "stops": [
           [13.9, 0],
-          [14, 0.8]
+          [14, 0.9]
         ]
       },
       "circle-radius": {
@@ -505,12 +516,12 @@ function setupOSMJunctions() {
       "visibility": "visible"
     },
     "paint": {
-      "circle-color": "#66cccc",
+      "circle-color": "#00cccc",
       "circle-opacity": {
         "base": 1,
         "stops": [
           [13.9, 0],
-          [14, 0.8]
+          [14, 0.9]
         ]
       },
       "circle-radius": {
