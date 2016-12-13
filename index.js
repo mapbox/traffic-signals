@@ -40,9 +40,9 @@ function hideDefaultLayers() {
 }
 
 function highlightMajorRoads() {
-  map.setPaintProperty("road-primary", "line-color", "hsl(0, 14%, 47%)");
-  map.setPaintProperty("road-secondary-tertiary", "line-color", "hsl(0, 14%, 47%)");
-  map.setPaintProperty("road-trunk", "line-color", "hsl(0, 14%, 47%)");
+  map.setPaintProperty("road-primary", "line-color", "#dddddd");
+  map.setPaintProperty("road-secondary-tertiary", "line-color", "#dddddd");
+  map.setPaintProperty("road-trunk", "line-color", "#dddddd");
 };
 
 function setupMapillary() {
@@ -284,7 +284,7 @@ function setupTileBoundaries() {
       "visibility": "visible",
     },
     "paint": {
-      "line-color": "red",
+      "line-color": "#cc6666",
     }
   });
 
@@ -299,7 +299,7 @@ function setupTileBoundaries() {
       "text-offset": [4, 4],
     },
     "paint": {
-      "text-color": "red",
+      "text-color": "#cc6666",
     }
   });
 
@@ -452,7 +452,7 @@ function setupOSMJunctions() {
       "visibility": "visible"
     },
     "paint": {
-      "circle-color": "hsl(50, 80%, 50%)",
+      "circle-color": "#ffff55",
       "circle-opacity": {
         "base": 1,
         "stops": [
@@ -468,6 +468,87 @@ function setupOSMJunctions() {
         ]
       }
     }
+  });
+
+  map.addLayer({
+    "id": "osmJunctionsReviewed",
+    "type": "circle",
+    "source": "osmJunctionsSource",
+    "layout": {
+      "visibility": "visible"
+    },
+    "paint": {
+      "circle-color": "#eeeeee",
+      "circle-opacity": {
+        "base": 1,
+        "stops": [
+          [13.9, 0],
+          [14, 0.8]
+        ]
+      },
+      "circle-radius": {
+        "base": 1,
+        "stops": [
+          [10, 2],
+          [13.9, 6]
+        ]
+      }
+    },
+    "filter": ["==", "status", "reviewed"]
+  });
+
+  map.addLayer({
+    "id": "osmJunctionsAdded",
+    "type": "circle",
+    "source": "osmJunctionsSource",
+    "layout": {
+      "visibility": "visible"
+    },
+    "paint": {
+      "circle-color": "#66cccc",
+      "circle-opacity": {
+        "base": 1,
+        "stops": [
+          [13.9, 0],
+          [14, 0.8]
+        ]
+      },
+      "circle-radius": {
+        "base": 1,
+        "stops": [
+          [10, 2],
+          [13.9, 6]
+        ]
+      }
+    },
+    "filter": ["==", "status", "added"]
+  });
+
+  map.addLayer({
+    "id": "osmJunctionsNoSignal",
+    "type": "circle",
+    "source": "osmJunctionsSource",
+    "layout": {
+      "visibility": "visible"
+    },
+    "paint": {
+      "circle-color": "#666666",
+      "circle-opacity": {
+        "base": 1,
+        "stops": [
+          [13.9, 0],
+          [14, 0.8]
+        ]
+      },
+      "circle-radius": {
+        "base": 1,
+        "stops": [
+          [10, 2],
+          [13.9, 6]
+        ]
+      }
+    },
+    "filter": ["==", "status", "nosignal"]
   });
 
   map.on('click', function(e) {
@@ -516,6 +597,8 @@ function setupOSMJunctions() {
           properties: junction.properties
         };
 
+        popup.remove();
+
         $.ajax({
           url: DATASETS_PROXY_URL + "/" + uid(reviewedFeature),
           type: "PUT",
@@ -526,7 +609,7 @@ function setupOSMJunctions() {
             .filter(f => uid(f) !== uid(reviewedFeature))
             .concat(reviewedFeature);
           map.getSource("osmJunctionsSource").setData(osmJunctions);
-          popup.remove();
+          map.setFilter("osmJunctionsHighlight", ["==", "id", ""]);
         });
       });
     }
