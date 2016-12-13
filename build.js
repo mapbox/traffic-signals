@@ -59,7 +59,7 @@ function setupMapillary() {
   map.addSource("mapillaryCoverage", {
     "type": "vector",
     "tiles": [
-      "http://d25uarhxywzl1j.cloudfront.net/v0.1/{z}/{x}/{y}.mvt"
+      "https://d25uarhxywzl1j.cloudfront.net/v0.1/{z}/{x}/{y}.mvt"
     ],
     "maxzoom": 14
   });
@@ -650,7 +650,7 @@ function setupJOSMButton() {
     left   = bounds.getWest(),
     right  = bounds.getEast();
 
-    var josmUrl = "http://127.0.0.1:8111/load_and_zoom?left=" + left + "&right=" + right + "&top=" + top + "&bottom=" + bottom;
+    var josmUrl = "https://127.0.0.1:8112/load_and_zoom?left=" + left + "&right=" + right + "&top=" + top + "&bottom=" + bottom;
 
     $.ajax(josmUrl, function() {});
   }
