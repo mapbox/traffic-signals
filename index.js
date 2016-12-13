@@ -9,7 +9,6 @@ var map = new mapboxgl.Map({
   center: [-122.4387, 37.7993],
   zoom: 14,
   hash: true,
-  attributionControl: false,
   keyboard: false
 });
 
