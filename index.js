@@ -608,6 +608,7 @@ function setupOSMJunctions() {
 
       $('#save-review').on('click', function() {
         junction.properties.status = $("input[name=review]:checked").val();
+        junction.properties.timestamp = Date.now();
 
         function uid(feature) {
           return feature.properties.uid;
