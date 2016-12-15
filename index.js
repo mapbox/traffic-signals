@@ -16,7 +16,7 @@ map.addControl(new mapboxgl.NavigationControl({
   position: "top-right"
 }));
 
-var mly = new Mapillary.Viewer("mly", "MFo5YmpwMmxHMmxJaUt3VW14c0ZCZzphZDU5ZDBjNTMzN2Y3YTE3", null);
+var mly = new Mapillary.Viewer("mly-viewer", "MFo5YmpwMmxHMmxJaUt3VW14c0ZCZzphZDU5ZDBjNTMzN2Y3YTE3", null);
 $("#mly").hide();
 
 map.once("load", function() {
@@ -267,6 +267,10 @@ function setupMapillary() {
   mly.on(Mapillary.Viewer.nodechanged, function(node) {
     map.setFilter("mapillaryImageHighlight", ["==", "key", node.key]);
     map.setFilter("mapillarySequenceLine", ["==", "key", node.sequenceKey]);
+  });
+
+  $('#mly-close').on('click', function(e) {
+    $('#mly').hide();
   });
 }
 
