@@ -1,4 +1,4 @@
-var turf = require("turf");
+var bboxPolygon = require("turf-bbox-polygon");
 var cover = require("tile-cover");
 
 mapboxgl.accessToken = "pk.eyJ1IjoicGxhbmVtYWQiLCJhIjoiemdYSVVLRSJ9.g3lbg_eN0kztmsfIPxa9MQ";
@@ -332,7 +332,7 @@ function setupTileBoundaries() {
       map.getBounds()["_ne"]["lat"]
     ];
 
-    var poly = turf.bboxPolygon(bbox);
+    var poly = bboxPolygon(bbox);
     var limits = {
       min_zoom: 16,
       max_zoom: 16
