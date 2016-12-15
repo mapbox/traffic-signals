@@ -227,7 +227,7 @@ function setupMapillary() {
     "filter": mapillaryRestrictionsFilter
   });
 
-  map.on('click', function(e) {
+  map.on("click", function(e) {
     var mapillaryRestrictions = map.queryRenderedFeatures([
       [e.point.x - 5, e.point.y - 5],
       [e.point.x + 5, e.point.y + 5]
@@ -270,8 +270,8 @@ function setupMapillary() {
     map.setFilter("mapillarySequenceLine", ["==", "key", node.sequenceKey]);
   });
 
-  $('#mly-close').on('click', function(e) {
-    $('#mly').hide();
+  $("#mly-close").on("click", function(e) {
+    $("#mly").hide();
   });
 }
 
@@ -437,7 +437,7 @@ function setupOSMJunctions() {
   });
 
   function getFeatures(startID) {
-    var url = DATASETS_PROXY_URL + (startID ? '?start=' + startID : '');
+    var url = DATASETS_PROXY_URL + (startID ? "?start=" + startID : "");
 
     $.getJSON(url, function(data) {
       if (data.features.length) {
@@ -578,7 +578,7 @@ function setupOSMJunctions() {
     "filter": ["==", "status", "nosignal"]
   });
 
-  map.on('click', function(e) {
+  map.on("click", function(e) {
     var selectedJunctions = map.queryRenderedFeatures([
       [e.point.x - 5, e.point.y - 5],
       [e.point.x + 5, e.point.y + 5]
@@ -611,7 +611,7 @@ function setupOSMJunctions() {
         .setHTML(reviewForm)
         .addTo(map);
 
-      $('#save-review').on('click', function() {
+      $("#save-review").on("click", function() {
         junction.properties.status = $("input[name=review]:checked").val();
         junction.properties.timestamp = Date.now();
 
@@ -620,7 +620,7 @@ function setupOSMJunctions() {
         }
 
         var reviewedFeature = {
-          type: 'Feature',
+          type: "Feature",
           geometry: junction.geometry,
           properties: junction.properties
         };
@@ -645,15 +645,15 @@ function setupOSMJunctions() {
 }
 
 function setupJOSMButton() {
-  $("#josm").on('click', openInJOSM);
+  $("#josm").on("click", openInJOSM);
 
   function openInJOSM() {
     var bounds = map.getBounds();
 
     var top    = bounds.getNorth(),
-    bottom = bounds.getSouth(),
-    left   = bounds.getWest(),
-    right  = bounds.getEast();
+        bottom = bounds.getSouth(),
+        left   = bounds.getWest(),
+        right  = bounds.getEast();
 
     var josmUrl = "https://127.0.0.1:8112/load_and_zoom?left=" + left + "&right=" + right + "&top=" + top + "&bottom=" + bottom;
 
