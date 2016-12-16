@@ -1,6 +1,6 @@
-var DATASETS_PROXY_URL = "https://xck30z94kl.execute-api.us-east-1.amazonaws.com/testing/features";
+var DATASETS_PROXY_URL = "https://cjj7opwkt0.execute-api.us-east-1.amazonaws.com/testing/features";
 
-var osmJunctions = {
+var osmReviews = {
   type: "FeatureCollection",
   features: []
 };
@@ -19,7 +19,7 @@ function getFeatures(startID) {
 
   $.getJSON(url, function(data) {
     if (data.features.length) {
-      osmJunctions.features = osmJunctions.features.concat(data.features);
+      osmReviews.features = osmReviews.features.concat(data.features);
 
       var lastFeatureID = data.features[data.features.length - 1].id;
       getFeatures(lastFeatureID);
@@ -31,15 +31,7 @@ function getFeatures(startID) {
 }
 
 function getStats() {
-  var reviewedJunctions = osmJunctions.features.filter(function(f) { return "status" in f.properties });
-
-  // Fix timestamps. If there's no timestamp, assume it was reviewed on 2016-12-14.
-  // We started saving timestamps after that date.
-  reviewedJunctions.forEach(function(f) {
-    if (!("timestamp" in f.properties)) {
-      f.properties.timestamp = 1481653800000;
-    }
-  });
+  var reviewedJunctions = osmReviews.features.filter(function(f) { return "status" in f.properties });
 
   reviewedJunctions.forEach(function(f) {
     var timestamp = f.properties.timestamp;
