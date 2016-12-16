@@ -1,5 +1,6 @@
 var bboxPolygon = require("turf-bbox-polygon");
 var cover = require("tile-cover");
+var hat = require('hat');
 
 mapboxgl.accessToken = "pk.eyJ1IjoicGxhbmVtYWQiLCJhIjoiemdYSVVLRSJ9.g3lbg_eN0kztmsfIPxa9MQ";
 
@@ -423,56 +424,47 @@ function setupOSMRestrictions() {
 }
 
 function setupOSMJunctions() {
-  var DATASETS_PROXY_URL = "https://xck30z94kl.execute-api.us-east-1.amazonaws.com/testing/features";
+  var DATASETS_PROXY_URL = "https://cjj7opwkt0.execute-api.us-east-1.amazonaws.com/testing/features";
 
-  var osmJunctions = {
+  map.addSource("osmJunctionsSource", {
+    "type": "vector",
+    "url": "mapbox://ajithranka.ciwrerjqm00042tllh6yy51fo-7g10r"
+  });
+
+  var osmReviews = {
     type: "FeatureCollection",
     features: []
   };
 
-  map.addSource("osmJunctionsSource", {
+  map.addSource("osmReviewsSource", {
     "type": "geojson",
-    "data": osmJunctions
+    "data": osmReviews
   });
 
-  function getFeatures(startID) {
+  function getReviews(startID) {
     var url = DATASETS_PROXY_URL + (startID ? "?start=" + startID : "");
 
     $.getJSON(url, function(data) {
       if (data.features.length) {
         data.features.forEach(f => f.properties.uid = f.id);
 
-        osmJunctions.features = osmJunctions.features.concat(data.features);
-        map.getSource("osmJunctionsSource")
-          .setData(osmJunctions);
+        osmReviews.features = osmReviews.features.concat(data.features);
+        map.getSource("osmReviewsSource")
+          .setData(osmReviews);
 
         var lastFeatureID = data.features[data.features.length - 1].id;
-        getFeatures(lastFeatureID);
+        getReviews(lastFeatureID);
       }
-    })
+    });
   }
 
-  getFeatures();
-
-  map.addLayer({
-    "id": "osmJunctionsHighlight",
-    "type": "circle",
-    "source": "osmJunctionsSource",
-    "layout": {
-      "visibility": "visible"
-    },
-    "paint": {
-      "circle-radius": 10,
-      "circle-opacity": 0.3,
-      "circle-color": "white"
-    },
-    "filter": ["==", "id", ""]
-  });
+  getReviews();
 
   map.addLayer({
     "id": "osmJunctions",
     "type": "circle",
     "source": "osmJunctionsSource",
+    "source-layer": "traffic-signals-v2-junctions",
     "layout": {
       "visibility": "visible"
     },
@@ -492,14 +484,13 @@ function setupOSMJunctions() {
           [13.9, 6]
         ]
       }
-    },
-    "filter": ["!has", "status"]
+    }
   });
 
   map.addLayer({
     "id": "osmJunctionsReviewed",
     "type": "circle",
-    "source": "osmJunctionsSource",
+    "source": "osmReviewsSource",
     "layout": {
       "visibility": "visible"
     },
@@ -526,7 +517,7 @@ function setupOSMJunctions() {
   map.addLayer({
     "id": "osmJunctionsAdded",
     "type": "circle",
-    "source": "osmJunctionsSource",
+    "source": "osmReviewsSource",
     "layout": {
       "visibility": "visible"
     },
@@ -553,7 +544,7 @@ function setupOSMJunctions() {
   map.addLayer({
     "id": "osmJunctionsNoSignal",
     "type": "circle",
-    "source": "osmJunctionsSource",
+    "source": "osmReviewsSource",
     "layout": {
       "visibility": "visible"
     },
@@ -585,7 +576,6 @@ function setupOSMJunctions() {
 
     if (selectedJunctions.length) {
       var selectedJunction = selectedJunctions[0];
-      map.setFilter("osmJunctionsHighlight", ["==", "uid", selectedJunction.properties.uid]);
       reviewJunction(selectedJunction);
     }
 
@@ -613,10 +603,7 @@ function setupOSMJunctions() {
       $("#save-review").on("click", function() {
         junction.properties.status = $("input[name=review]:checked").val();
         junction.properties.timestamp = Date.now();
-
-        function uid(feature) {
-          return feature.properties.uid;
-        }
+        junction.properties.uid = junction.properties.uid || hat();
 
         var reviewedFeature = {
           type: "Feature",
@@ -627,16 +614,15 @@ function setupOSMJunctions() {
         popup.remove();
 
         $.ajax({
-          url: DATASETS_PROXY_URL + "/" + uid(reviewedFeature),
+          url: DATASETS_PROXY_URL + "/" + junction.properties.uid,
           type: "PUT",
           contentType: "application/json",
           data: JSON.stringify(reviewedFeature)
         }).done(function(response) {
-          osmJunctions.features = osmJunctions.features
-            .filter(f => uid(f) !== uid(reviewedFeature))
-            .concat(reviewedFeature);
-          map.getSource("osmJunctionsSource").setData(osmJunctions);
-          map.setFilter("osmJunctionsHighlight", ["==", "id", ""]);
+          osmReviews.features = osmReviews.features
+            .filter(f => f.properties.uid !== response.properties.uid)
+            .concat(response);
+          map.getSource("osmReviewsSource").setData(osmReviews);
         });
       });
     }
