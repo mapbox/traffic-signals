@@ -345,12 +345,9 @@ function setupTileBoundaries() {
     };
 
     var geojson = cover.geojson(poly.geometry, limits);
-    var indexes = [];
-    indexes = cover.tiles(poly.geometry, limits);
-    var arr = geojson.features;
-    var i;
+    var indexes = cover.tiles(poly.geometry, limits);
 
-    for(i = 0; i < geojson.features.length; i++) {
+    for(var i = 0; i < geojson.features.length; i++) {
       geojson.features[i]["properties"] = {"id" : indexes[i][0] + ", " + indexes[i][1]};
     }
 
