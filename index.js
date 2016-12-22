@@ -1,5 +1,3 @@
-var bboxPolygon = require("turf-bbox-polygon");
-var cover = require("tile-cover");
 var hat = require('hat');
 
 mapboxgl.accessToken = "pk.eyJ1IjoicGxhbmVtYWQiLCJhIjoiemdYSVVLRSJ9.g3lbg_eN0kztmsfIPxa9MQ";
@@ -277,17 +275,15 @@ function setupMapillary() {
 
 function setupTileBoundaries() {
   map.addSource("tileBoundarySource", {
-    "type": "geojson",
-    "data": {
-      "type": "FeatureCollection",
-      "features": []
-    }
+    "type": "vector",
+    "url": "mapbox://ajithranka.511ax0l2"
   });
 
   map.addLayer({
     "id": "tileBoundaryGrid",
     "type": "line",
     "source": "tileBoundarySource",
+    "source-layer": "sf_bay_z16_tiles-6ryl4w",
     "layout": {
       "visibility": "visible",
     },
@@ -300,6 +296,7 @@ function setupTileBoundaries() {
     "id": "tileBoundaryText",
     "type": "symbol",
     "source": "tileBoundarySource",
+    "source-layer": "sf_bay_z16_tiles-6ryl4w",
     "layout": {
       "visibility": "visible",
       "text-field": "{id}",
@@ -317,46 +314,6 @@ function setupTileBoundaries() {
       "text-color": "#cc6666",
     }
   });
-
-  map.on("moveend", function() {
-    if (map.getZoom() > 13) {
-      showTileBoundary();
-    } else {
-      hideTileBoundary();
-    }
-  });
-
-  function showTileBoundary() {
-    map.setLayoutProperty("tileBoundaryGrid", "visibility", "visible");
-    map.setLayoutProperty("tileBoundaryText", "visibility", "visible");
-
-    var bbox = [
-      map.getBounds()["_sw"]["lng"],
-      map.getBounds()["_sw"]["lat"],
-      map.getBounds()["_ne"]["lng"],
-      map.getBounds()["_ne"]["lat"]
-    ];
-
-    var poly = bboxPolygon(bbox);
-    var limits = {
-      min_zoom: 16,
-      max_zoom: 16
-    };
-
-    var geojson = cover.geojson(poly.geometry, limits);
-    var indexes = cover.tiles(poly.geometry, limits);
-
-    for(var i = 0; i < geojson.features.length; i++) {
-      geojson.features[i]["properties"] = {"id" : indexes[i][0] + ", " + indexes[i][1]};
-    }
-
-    map.getSource("tileBoundarySource").setData(geojson);
-  }
-
-  function hideTileBoundary() {
-    map.setLayoutProperty("tileBoundaryGrid", "visibility", "none");
-    map.setLayoutProperty("tileBoundaryText", "visibility", "none");
-  }
 }
 
 function setupOSMRestrictions() {
