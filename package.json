@@ -13,6 +13,7 @@
     "watchify": "^3.7.0"
   },
   "dependencies": {
-    "hat": "0.0.3"
+    "hat": "0.0.3",
+    "turf-bbox": "^3.0.12"
   }
 }

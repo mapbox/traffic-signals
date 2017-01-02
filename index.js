@@ -1,4 +1,5 @@
 var hat = require('hat');
+var bbox = require('turf-bbox');
 
 mapboxgl.accessToken = "pk.eyJ1IjoicGxhbmVtYWQiLCJhIjoiemdYSVVLRSJ9.g3lbg_eN0kztmsfIPxa9MQ";
 
@@ -62,6 +63,11 @@ function setupMapillary() {
     "maxzoom": 14
   });
 
+  map.addSource("mapillaryImagesSource", {
+    "type": "geojson",
+    "data": mapillaryImages
+  });
+
   var mapillaryRestrictionsFilter = [
     "in",
     "value",
@@ -105,8 +111,7 @@ function setupMapillary() {
   map.addLayer({
     "id": "mapillaryImages",
     "type": "symbol",
-    "source": "mapillaryCoverage",
-    "source-layer": "mapillary-images",
+    "source": "mapillaryImagesSource",
     "layout": {
       "icon-image": "Pointer-2",
       "icon-rotate": {
@@ -128,8 +133,7 @@ function setupMapillary() {
   map.addLayer({
     "id": "mapillaryImageHighlight",
     "type": "symbol",
-    "source": "mapillaryCoverage",
-    "source-layer": "mapillary-images",
+    "source": "mapillaryImagesSource",
     "layout": {
       "icon-image": "Pointer-2-focus",
       "icon-rotate": {
@@ -144,8 +148,7 @@ function setupMapillary() {
   map.addLayer({
     "id": "mapillarySequenceImages",
     "type": "symbol",
-    "source": "mapillaryCoverage",
-    "source-layer": "mapillary-images",
+    "source": "mapillaryImagesSource",
     "layout": {
       "icon-image": "Pointer-1",
       "icon-rotate": {
@@ -160,8 +163,7 @@ function setupMapillary() {
   map.addLayer({
     "id": "mapillarySequenceImagesHighlight",
     "type": "symbol",
-    "source": "mapillaryCoverage",
-    "source-layer": "mapillary-images",
+    "source": "mapillaryImagesSource",
     "layout": {
       "icon-image": "Pointer-1-focus",
       "icon-rotate": {
@@ -253,10 +255,8 @@ function setupMapillary() {
     if (mapillaryImages.length) {
       var image = mapillaryImages[0];
       var imageKey = image.properties.key;
-      var sequenceKey = image.properties.skey;
 
       map.setFilter("mapillaryImageHighlight", ["==", "key", imageKey]);
-      map.setFilter("mapillarySequenceLine", ["==", "key", sequenceKey]);
 
       $("#mly").show();
       mly.moveToKey(imageKey);
@@ -272,6 +272,13 @@ function setupMapillary() {
     $("#mly").hide();
   });
 }
+
+var mapillaryImages = {
+  "type": "FeatureCollection",
+  "features": []
+};
+
+var selectedTileId;
 
 function setupTileBoundaries() {
   map.addSource("tileBoundarySource", {
@@ -293,6 +300,21 @@ function setupTileBoundaries() {
   });
 
   map.addLayer({
+    "id": "tileBoundaryGridSelected",
+    "type": "line",
+    "source": "tileBoundarySource",
+    "source-layer": "sf_bay_z16_tiles-6ryl4w",
+    "layout": {
+      "visibility": "visible",
+    },
+    "paint": {
+      "line-color": "#6aa8da",
+      "line-width": 3
+    },
+    "filter": ["==", "id", ""]
+  });
+
+  map.addLayer({
     "id": "tileBoundaryText",
     "type": "symbol",
     "source": "tileBoundarySource",
@@ -304,7 +326,7 @@ function setupTileBoundaries() {
         "base": 1.5,
         "stops": [
           [13, 8],
-          [14, 14]
+          [15, 14]
         ]
       },
       "text-offset": [0, 0],
@@ -312,8 +334,80 @@ function setupTileBoundaries() {
     },
     "paint": {
       "text-color": "#cc6666",
+      "text-halo-color": "rgba(255,255,255,0.75)",
+      "text-halo-width": 0.5,
+      "text-halo-blur": 0.5
     }
   });
+
+  map.addLayer({
+    "id": "tileBoundaryTextSelected",
+    "type": "symbol",
+    "source": "tileBoundarySource",
+    "source-layer": "sf_bay_z16_tiles-6ryl4w",
+    "layout": {
+      "visibility": "visible",
+      "text-field": "{id}",
+      "text-size":  {
+        "base": 1.5,
+        "stops": [
+          [13, 8],
+          [15, 14]
+        ]
+      },
+      "text-offset": [0, 0],
+      "text-anchor": "center",
+    },
+    "paint": {
+      "text-color": "#6aa8da",
+      "text-halo-color": "rgba(255,255,255,0.75)",
+      "text-halo-width": 0.5,
+      "text-halo-blur": 0.5
+    },
+    "filter": ["==", "id", ""]
+  });
+
+  map.on("click", function(e) {
+    var selectedTiles = map.queryRenderedFeatures([
+      [e.point.x - 5, e.point.y - 5],
+      [e.point.x + 5, e.point.y + 5]
+    ], { layers: ["tileBoundaryText"] });
+
+    if (selectedTiles.length) {
+      selectedTileId = selectedTiles[0].properties.id;
+
+      var selectedPolygon = map.queryRenderedFeatures(
+        { layers: ["tileBoundaryGrid"], filter: ["==", "id", selectedTileId] }
+      )[0];
+
+      var selectedBbox = bbox(selectedPolygon);
+
+      map.setFilter("tileBoundaryTextSelected", ["==", "id", selectedTileId]);
+      map.setFilter("tileBoundaryGridSelected", ["==", "id", selectedTileId]);
+
+      resetMapillaryImages();
+      fetchMapillaryImages(selectedBbox);
+    }
+  });
+
+  function resetMapillaryImages() {
+    mapillaryImages.features = [];
+    map.getSource("mapillaryImagesSource").setData(mapillaryImages);
+  }
+
+  function fetchMapillaryImages(bbox) {
+    var url = "https://a.mapillary.com/v2/search/im/geojson?client_id=MFo5YmpwMmxHMmxJaUt3VW14c0ZCZzphZDU5ZDBjNTMzN2Y3YTE3"
+    + "&min_lon=" + bbox[0]
+    + "&min_lat=" + bbox[1]
+    + "&max_lon=" + bbox[2]
+    + "&max_lat=" + bbox[3]
+    + "&limit=100000";
+
+    $.getJSON(url, function(data) {
+      mapillaryImages.features = data.features;
+      map.getSource("mapillaryImagesSource").setData(mapillaryImages);
+    });
+  }
 }
 
 function setupOSMRestrictions() {
