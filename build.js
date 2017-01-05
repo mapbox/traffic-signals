@@ -9,7 +9,8 @@ var map = new mapboxgl.Map({
   center: [-122.4387, 37.7993],
   zoom: 14,
   hash: true,
-  keyboard: false
+  keyboard: false,
+  dragRotate: false
 });
 
 map.addControl(new mapboxgl.NavigationControl({
